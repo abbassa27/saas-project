@@ -15,18 +15,18 @@ export default function LeadPopup() {
 
     const form = new FormData(e.target);
 
-    await fetch("http://127.0.0.1:5000/api/lead", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        name: form.get("name"),
-        email: form.get("email"),
-        service: form.get("service"),
-        source: "seo-popup",
-      }),
-    });
+    await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/lead`, {
+  method: "POST",
+  headers: {
+    "Content-Type": "application/json",
+  },
+  body: JSON.stringify({
+    name: form.get("name"),
+    email: form.get("email"),
+    service: form.get("service"),
+    source: "seo-popup",
+  }),
+});
 
     setShow(false);
   };

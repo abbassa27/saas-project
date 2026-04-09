@@ -1,19 +1,27 @@
 // NEW FEATURE START
 
 export async function POST(req) {
-  const body = await req.json();
+  const { keyword } = await req.json();
 
-  const res = await fetch("http://127.0.0.1:5000/api/pipeline/run", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
+  // AI PROMPT
+  const content = `
+  Write a high-converting SEO article about "${keyword}" for Amazon KDP authors.
+
+  Include:
+  - Engaging intro
+  - Benefits
+  - Call to action
+  `;
+
+  return Response.json({
+    data: {
+      title: `Best ${keyword} Services in 2026`,
+      content: content,
+      funnel: {
+        link: "https://www.upwork.com/",
+      },
     },
-    body: JSON.stringify(body),
   });
-
-  const data = await res.json();
-
-  return Response.json(data);
 }
 
 // NEW FEATURE END
