@@ -1,0 +1,3 @@
+// NEW FEATURE START: ENTRY POINT V116
+require("./app");
+// NEW FEATURE END

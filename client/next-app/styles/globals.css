@@ -1,0 +1,13 @@
+/* NEW FEATURE START: TAILWIND BASE */
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+body {
+  background: #0f172a;
+  color: white;
+  font-family: sans-serif;
+}
+
+/* NEW FEATURE END */
