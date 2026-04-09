@@ -1,45 +1,89 @@
-const express=require("express");
-const mongoose=require("mongoose");
+// NEW FEATURE START
+
+const express = require("express");
+const mongoose = require("mongoose");
+const cors = require("cors");
 require("dotenv").config();
 
-const app=express();
+const app = express(); // ✅ لازم قبل أي use
+
+// ✅ Middleware
+app.use(cors());
 app.use(express.json());
 
-mongoose.connect(process.env.MONGO_URI);
-
-const Post=require("mongoose").model("Post",new mongoose.Schema({
- title:String,content:String,date:{type:Date,default:Date.now}
-}));
-
-setInterval(async ()=>{
- await Post.create({title:"Auto Post",content:"SEO content"});
-},60000);
-
-app.get("/api/blog",async(req,res)=>{
- res.json(await Post.find().sort({date:-1}));
+// ✅ Route للتأكد أن السيرفر يعمل
+app.get("/", (req, res) => {
+  res.send("🚀 SaaS Backend is running");
 });
 
-app.get("/cta",(req,res)=>res.redirect(process.env.UPWORK_URL));
+// ✅ الاتصال بـ MongoDB
+mongoose
+  .connect(process.env.MONGO_URI)
+  .then(() => console.log("✅ MongoDB Connected"))
+  .catch((err) => console.error("❌ MongoDB Error:", err));
 
-app.listen(5000);
+// ✅ Model بسيط
+const Post = mongoose.model(
+  "Post",
+  new mongoose.Schema({
+    title: String,
+    content: String,
+    date: { type: Date, default: Date.now },
+  })
+);
+
+// ✅ Auto content (كل دقيقة)
+setInterval(async () => {
+  try {
+    await Post.create({
+      title: "Auto Post",
+      content: "SEO content generated...",
+    });
+    console.log("📝 New post created");
+  } catch (err) {
+    console.error(err);
+  }
+}, 60000);
+
+// ✅ API Blog
+app.get("/api/blog", async (req, res) => {
+  const posts = await Post.find().sort({ date: -1 });
+  res.json(posts);
+});
+
+// ✅ Funnel (CTA → Upwork)
+app.get("/cta", (req, res) => {
+  res.redirect(process.env.UPWORK_URL || "https://upwork.com");
+});
+
+// NEW FEATURE END
 
 
-// =====================
-// 🚀 NEW FEATURE START: MASTER REFACTOR INTEGRATION
-// =====================
-try {
-  const dashboardRoutes = require("./routes/dashboard");
-  const { trackEvent } = require("./core/dataHub");
+// NEW FEATURE START: PIPELINE API
 
-  app.use("/api/dashboard", dashboardRoutes);
+app.post("/api/pipeline/run", (req, res) => {
+  const { keyword } = req.body;
 
-  app.use((req,res,next)=>{
-    trackEvent({path:req.path, date:new Date()});
-    next();
+  res.json({
+    data: {
+      title: `Best ${keyword} Services`,
+      content: `This is AI generated content for ${keyword}. We help you get professional results for Amazon KDP and ebook publishing.`,
+      funnel: {
+        link: process.env.UPWORK_URL || "https://www.upwork.com",
+      },
+    },
   });
+});
 
-  console.log("🧠 REFACTOR MASTER ACTIVE");
-} catch(e) {}
-// =====================
-// 🚀 NEW FEATURE END
-// =====================
+// NEW FEATURE END
+
+
+// NEW FEATURE START: SERVER START
+
+const PORT = process.env.PORT || 5000;
+
+app.listen(PORT, () => {
+  console.log(`🚀 Server running on port ${PORT}`);
+});
+
+// NEW FEATURE END
