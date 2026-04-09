@@ -29,18 +29,51 @@ export default function SEOPage() {
   }, [slug]);
 
   return (
-    <main style={{ padding: "40px", fontFamily: "sans-serif" }}>
-      <h1>{slug.replace(/-/g, " ")}</h1>
+    <main
+      style={{
+        padding: "40px",
+        fontFamily: "sans-serif",
+        background: "#0f0f0f",
+        color: "#fff",
+        minHeight: "100vh",
+      }}
+    >
+      {/* TITLE */}
+      <h1 style={{ fontSize: "32px", marginBottom: "10px" }}>
+        🚀 {slug.replace(/-/g, " ")}
+      </h1>
 
-      {!data && <p>Loading AI content...</p>}
+      {/* LOADING */}
+      {!data && <p style={{ opacity: 0.7 }}>Loading AI content...</p>}
 
+      {/* AI CONTENT */}
       {data && (
         <>
-          <h2>{data.title}</h2>
-          <p>{data.content}</p>
+          <h2 style={{ marginTop: "20px", color: "#d4af37" }}>
+            {data.title}
+          </h2>
 
-          <a href={data.funnel.link} target="_blank">
-            👉 Hire me
+          <p style={{ marginTop: "15px", lineHeight: "1.7", opacity: 0.9 }}>
+            {data.content}
+          </p>
+
+          {/* CTA BUTTON */}
+          <a
+            href={data?.funnel?.link || "https://www.upwork.com/"}
+            target="_blank"
+            style={{
+              display: "inline-block",
+              marginTop: "30px",
+              padding: "12px 25px",
+              background: "#d4af37",
+              color: "#000",
+              textDecoration: "none",
+              borderRadius: "8px",
+              fontWeight: "bold",
+              transition: "0.3s",
+            }}
+          >
+            💼 Hire Me Now
           </a>
         </>
       )}
