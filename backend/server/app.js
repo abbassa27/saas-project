@@ -1,4 +1,4 @@
-// NEW FEATURE START: FULL V115 FINAL APP.JS
+// NEW FEATURE START: V116 CLEAN BACKEND FULL
 
 const express = require("express");
 const mongoose = require("mongoose");
@@ -11,16 +11,35 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
+// ================= LOGGER =================
+app.use((req,res,next)=>{
+  console.log(`📡 ${req.method} ${req.url}`);
+  next();
+});
+
 // ================= ROUTES =================
 
 // Root
 app.get("/", (req, res) => {
-  res.send("🚀 SaaS Backend is running");
+  res.send("🚀 SaaS Backend CLEAN V116");
 });
 
-// CTA → Upwork
+// CTA
 app.get("/cta", (req, res) => {
   res.redirect(process.env.UPWORK_URL || "https://upwork.com");
+});
+
+// ================= AUTH =================
+const jwt = require("jsonwebtoken");
+
+app.post("/api/auth/login", (req, res) => {
+  const { email } = req.body;
+
+  const token = jwt.sign({ email }, process.env.JWT_SECRET || "secret", {
+    expiresIn: "7d",
+  });
+
+  res.json({ token });
 });
 
 // ================= MONGODB =================
@@ -30,8 +49,6 @@ mongoose
   .catch((err) => console.error("❌ MongoDB Error:", err));
 
 // ================= MODELS =================
-
-// Blog Post Model
 const Post = mongoose.model(
   "Post",
   new mongoose.Schema({
@@ -41,7 +58,6 @@ const Post = mongoose.model(
   })
 );
 
-// Lead Model (NEW)
 const Lead = mongoose.model(
   "Lead",
   new mongoose.Schema({
@@ -60,7 +76,6 @@ setInterval(async () => {
       title: "Auto Post",
       content: "SEO content generated...",
     });
-    console.log("📝 New post created");
   } catch (err) {
     console.error(err);
   }
@@ -68,20 +83,20 @@ setInterval(async () => {
 
 // ================= API =================
 
-// Blog API
+// Blog
 app.get("/api/blog", async (req, res) => {
   const posts = await Post.find().sort({ date: -1 });
   res.json(posts);
 });
 
-// Pipeline API
+// Pipeline
 app.post("/api/pipeline/run", (req, res) => {
   const { keyword } = req.body;
 
   res.json({
     data: {
       title: `Best ${keyword} Services`,
-      content: `This is AI generated content for ${keyword}. We help you get professional results for Amazon KDP and ebook publishing.`,
+      content: `AI content for ${keyword}`,
       funnel: {
         link: process.env.UPWORK_URL || "https://www.upwork.com",
       },
@@ -89,29 +104,21 @@ app.post("/api/pipeline/run", (req, res) => {
   });
 });
 
-// ================= LEAD SYSTEM (V115) =================
-
-// Save Lead
+// ================= LEADS =================
 app.post("/api/lead", async (req, res) => {
-  try {
-    const lead = new Lead(req.body);
-    await lead.save();
-
-    res.json({
-      success: true,
-      message: "Lead saved successfully",
-    });
-  } catch (err) {
-    res.status(500).json({
-      error: err.message,
-    });
-  }
+  const lead = new Lead(req.body);
+  await lead.save();
+  res.json({ success: true });
 });
 
-// Get Leads (for dashboard later)
-app.get("/api/lead", async (req, res) => {
-  const leads = await Lead.find().sort({ createdAt: -1 });
-  res.json(leads);
+// ================= DASHBOARD =================
+const dashboardRoute = require("./routes/dashboard");
+app.use("/api/dashboard", dashboardRoute);
+
+// ================= AI =================
+app.post("/api/ai/generate", async (req, res) => {
+  const { prompt } = req.body;
+  res.json({ result: `AI Generated: ${prompt}` });
 });
 
 // ================= SERVER =================

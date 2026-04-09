@@ -1,8 +1,8 @@
-// NEW FEATURE START: CENTRAL DATA HUB
+// NEW FEATURE START: DATA HUB SYSTEM
 
 const mongoose = require("mongoose");
 
-// reuse existing models
+// Reuse existing models بدون تعديل
 const Lead = mongoose.model("Lead");
 const Post = mongoose.model("Post");
 
@@ -30,7 +30,9 @@ async function getState() {
       },
     };
   } catch (err) {
-    return { error: err.message };
+    return {
+      error: err.message,
+    };
   }
 }
 

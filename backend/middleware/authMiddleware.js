@@ -1,4 +1,4 @@
-// NEW FEATURE START: CENTRAL AUTH MIDDLEWARE
+// NEW FEATURE START: AUTH MIDDLEWARE FULL
 
 const jwt = require("jsonwebtoken");
 
@@ -6,7 +6,7 @@ module.exports = function (req, res, next) {
   const token = req.headers["authorization"];
 
   if (!token) {
-    return res.status(401).json({ error: "No token provided" });
+    return res.status(401).json({ error: "Access denied. No token." });
   }
 
   try {
@@ -14,7 +14,7 @@ module.exports = function (req, res, next) {
     req.user = decoded;
     next();
   } catch (err) {
-    return res.status(403).json({ error: "Invalid token" });
+    return res.status(400).json({ error: "Invalid token" });
   }
 };
 
