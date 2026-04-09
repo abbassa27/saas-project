@@ -32,6 +32,29 @@ router.get("/posts", auth, async (req, res) => {
   res.json(posts);
 });
 
+// NEW FEATURE START (ANALYTICS DASHBOARD)
+router.get("/analytics", auth, async (req, res) => {
+  const mongoose = require("mongoose");
+
+  const Tracking = mongoose.model("Tracking");
+  const Lead = mongoose.model("Lead");
+  const Post = mongoose.model("Post");
+
+  const visitors = await Tracking.countDocuments({ type: "click" });
+  const conversions = await Tracking.countDocuments({ type: "conversion" });
+
+  const leads = await Lead.countDocuments();
+  const posts = await Post.countDocuments();
+
+  res.json({
+    visitors,
+    conversions,
+    leads,
+    posts,
+  });
+});
+// NEW FEATURE END
+
 // =====================
 // 🚀 NEW FEATURE END
 // =====================
