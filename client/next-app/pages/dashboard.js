@@ -26,6 +26,12 @@ export default function Dashboard() {
   const [chartData, setChartData] = useState([]);
   // NEW FEATURE END
 
+  // NEW FEATURE START (AI + ADVANCED ANALYTICS STATE)
+  const [aiResult, setAiResult] = useState("");
+  const [loadingAI, setLoadingAI] = useState(false);
+  const [advancedAnalytics, setAdvancedAnalytics] = useState(null);
+  // NEW FEATURE END
+
   useEffect(() => {
     const token = localStorage.getItem("token");
 
@@ -54,6 +60,16 @@ export default function Dashboard() {
           setError(err.message);
           setLoading(false);
         });
+
+      // NEW FEATURE START (FETCH ADVANCED ANALYTICS)
+      fetch("http://localhost:5000/api/dashboard/analytics", {
+        headers: { Authorization: token }
+      })
+        .then(res => res.json())
+        .then(setAdvancedAnalytics)
+        .catch(()=>{});
+      // NEW FEATURE END
+
     } else {
       setLoading(false);
     }
@@ -70,6 +86,27 @@ export default function Dashboard() {
     const d = await res.json();
     localStorage.setItem("token", d.token);
     window.location.reload();
+  };
+  // NEW FEATURE END
+
+  // NEW FEATURE START (AI GENERATOR FUNCTION)
+  const handleGenerateAI = async () => {
+    setLoadingAI(true);
+
+    const res = await fetch("http://localhost:5000/api/ai/generate", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        prompt: "Write SEO content about book cover design",
+        type: "blog",
+      }),
+    });
+
+    const d = await res.json();
+    setAiResult(d.result);
+    setLoadingAI(false);
   };
   // NEW FEATURE END
 
@@ -94,6 +131,25 @@ export default function Dashboard() {
 
       <h1>Dashboard</h1>
 
+      {/* NEW FEATURE START: AI GENERATOR */}
+      <div style={{marginBottom:20}}>
+        <button onClick={handleGenerateAI} style={{
+          background:"gold",
+          padding:"10px 20px",
+          borderRadius:10,
+          fontWeight:"bold"
+        }}>
+          {loadingAI ? "Generating..." : "🔥 Generate AI Content"}
+        </button>
+
+        {aiResult && (
+          <div style={{marginTop:10,background:"#111",padding:15}}>
+            {aiResult}
+          </div>
+        )}
+      </div>
+      {/* NEW FEATURE END */}
+
       {/* NEW FEATURE START: STATS CARDS */}
       <div style={{display:"flex",gap:20,marginBottom:20}}>
         <motion.div whileHover={{scale:1.05}} style={{padding:20,border:"1px solid #333"}}>
@@ -104,6 +160,16 @@ export default function Dashboard() {
           Posts: {data.stats.totalPosts}
         </motion.div>
       </div>
+      {/* NEW FEATURE END */}
+
+      {/* NEW FEATURE START: ADVANCED ANALYTICS */}
+      {advancedAnalytics && (
+        <div style={{marginBottom:20}}>
+          <h3>Advanced Analytics</h3>
+          <p>Visitors: {advancedAnalytics.visitors}</p>
+          <p>Conversions: {advancedAnalytics.conversions}</p>
+        </div>
+      )}
       {/* NEW FEATURE END */}
 
       {/* NEW FEATURE START: CHARTS */}
